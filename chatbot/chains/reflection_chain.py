@@ -13,26 +13,24 @@ class ReflectionChain:
     """
 
     def __init__(self, memory: MindEaseMemory = None):
-        # Initialize Cohere model
+        
         self.llm = ChatCohere(
             cohere_api_key=Config.COHERE_API_KEY,
             model=Config.COHERE_MODEL,
-            temperature=0.8,  # Slightly higher for creative reflections
+            temperature=0.8, 
             max_tokens=200
         )
 
-        # Use shared memory (conversation + emotions)
+        
         self.memory = memory or MindEaseMemory()
 
-        # Create prompt (convert REFLECTION_PROMPT to a LangChain prompt if needed)
-        # If REFLECTION_PROMPT is already a ChatPromptTemplate, no change needed
+    
         if isinstance(REFLECTION_PROMPT, str):
             self.prompt = ChatPromptTemplate.from_template(REFLECTION_PROMPT)
         else:
             self.prompt = REFLECTION_PROMPT
 
-        # Build chain using RunnableSequence
-        # (Prompt + LLM) → simple and clean pipeline
+    
         self.chain = self.prompt | self.llm
 
     def generate_reflection(self) -> str:
@@ -40,13 +38,13 @@ class ReflectionChain:
         try:
             chat_history = self.memory.get_chat_history()
 
-            # Only generate reflections if there's meaningful history
+            
             if len(chat_history) < 4:
                 return None
 
-            # Run prompt + LLM pipeline
+            
             reflection = self.chain.invoke({"chat_history": chat_history})
-            # New LLM output is usually in .content, not dict['output']
+        
             if hasattr(reflection, "content"):
                 return reflection.content.strip()
             elif isinstance(reflection, dict):
