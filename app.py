@@ -124,14 +124,21 @@ with st.sidebar:
         
         Remember: This is not a replacement for professional mental health care.
         """)
+        st.divider()
+    st.markdown("""
+    <div style='text-align: center; color: #888; font-size: 0.75rem;'>
+        <p>© 2025 All Rights Reserved</p>
+        <p>Developed by <strong>Samadhi Jagathsiri</strong></p>
+    </div>
+    """, unsafe_allow_html=True)
     
     
 
-# Main content
+
 st.markdown('<h1 class="main-header">🌱 Calmera AI</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">A safe space for your thoughts and feelings</p>', unsafe_allow_html=True)
 
-# Display chat messages
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -219,9 +226,4 @@ if prompt := st.chat_input("Share what's on your mind..."):
 st.divider()
 st.caption("⚠️ Calmera is a supportive tool, not a substitute for professional mental health care. If you're in crisis, please contact emergency services or a crisis helpline.")
 
-st.markdown("""
-<div class="footer">
-    <p>© 2025 Calmera AI. All Rights Reserved.</p>
-    <p>Developed by <strong>Samadhi Jagathsiri</strong></p>
-</div>
-""", unsafe_allow_html=True)
+
