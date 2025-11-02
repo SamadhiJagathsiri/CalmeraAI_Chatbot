@@ -1,14 +1,10 @@
 import streamlit as st
 from chatbot.mindease_ai import MindEaseAI
 import time
+import os
 
 st.write("Current working directory:", os.getcwd())
 
-# List all folders and files in the repo
-for root, dirs, files in os.walk("."):
-    st.write("Folder:", root)
-    st.write("Subfolders:", dirs)
-    st.write("Files:", files)
 
 st.set_page_config(
     page_title="MindEase AI - Your Wellness Companion",
