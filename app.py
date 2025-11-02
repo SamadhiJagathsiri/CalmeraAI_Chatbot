@@ -213,8 +213,15 @@ if prompt := st.chat_input("Share what's on your mind..."):
                 
             except Exception as e:
                 st.error(f"Error generating response: {str(e)}")
-                st.write("Please try again or start a new conversation.")
+                st.write("Please try again or start a new conversation.")                                                                                                     
 
 
 st.divider()
 st.caption("⚠️ Calmera is a supportive tool, not a substitute for professional mental health care. If you're in crisis, please contact emergency services or a crisis helpline.")
+
+st.markdown("""
+<div class="footer">
+    <p>© 2025 Calmera AI. All Rights Reserved.</p>
+    <p>Developed by <strong>Samadhi Jagathsiri</strong></p>
+</div>
+""", unsafe_allow_html=True)
