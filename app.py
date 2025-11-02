@@ -2,7 +2,9 @@ import streamlit as st
 from chatbot.mindease_ai import MindEaseAI
 import time
 from utils.vectorstore_manager import VectorStoreManager
+import utils.vectorstore_manager as vsm
 
+st.write("Using VectorStoreManager from:", vsm.__file__)
 
 # -----------------------------
 # Build or load vector store first
