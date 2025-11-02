@@ -3,29 +3,28 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 import os
 
-
 class WellnessDocumentLoader:
     """Load and process wellness guide PDFs"""
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  
-    ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, "..")) 
-    GUIDES_PATH = os.path.join(ROOT_DIR, "data", "guides")
+    GUIDES_PATH = os.path.join(os.getcwd(), "data", "guides")
 
     def __init__(self, guides_path: str = None, chunk_size: int = 1000, chunk_overlap: int = 200):
         self.guides_path = guides_path or self.GUIDES_PATH
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
-            separators=["\n\n", "\n", ". ", " ", ""]
+            separators=["\n\n", "\n", ". ", " "]
         )
 
     def load_documents(self):
         """Load all PDF documents from guides directory"""
+        print("Looking for PDFs in:", self.guides_path)
         if not os.path.exists(self.guides_path):
             os.makedirs(self.guides_path)
             print(f"Created {self.guides_path} - add PDF wellness guides here")
             return []
 
+        print("Files found:", os.listdir(self.guides_path))
         loader = DirectoryLoader(
             self.guides_path,
             glob="**/*.pdf",
@@ -53,4 +52,3 @@ class WellnessDocumentLoader:
         """Complete document processing pipeline"""
         docs = self.load_documents()
         return self.split_documents(docs)
-
