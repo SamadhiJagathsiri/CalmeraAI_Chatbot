@@ -6,7 +6,8 @@ from utils.document_loader import WellnessDocumentLoader
 # Initialize Loader and AI
 # -----------------------------
 loader = WellnessDocumentLoader()  # handles path internally
-mindease = MindEaseAI(document_loader=loader)
+mindease = MindEaseAI()
+
 
 # -----------------------------
 # Streamlit page configuration
