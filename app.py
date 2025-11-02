@@ -1,18 +1,21 @@
 import streamlit as st
+import os
 from chatbot.mindease_ai import MindEaseAI
-from utils.document_loader import WellnessDocumentLoader
+from utils.document_loader import WellnessDocumentLoader  # import the loader
+import time
 
 # -----------------------------
-# Initialize Loader and AI
+# Set up and check PDF guides
 # -----------------------------
-loader = WellnessDocumentLoader()  # handles path internally
-mindease = MindEaseAI()
 
+# Initialize the loader (it will use the correct path automatically)
+loader = WellnessDocumentLoader()
+chunks = loader.process_documents()  # load and split PDFs
 
 
 
 # -----------------------------
-# Streamlit page configuration
+# Page configuration
 # -----------------------------
 st.set_page_config(
     page_title="MindEase AI - Your Wellness Companion",
@@ -38,7 +41,7 @@ st.markdown("""
 # -----------------------------
 def init_session_state():
     if "mindease" not in st.session_state:
-        st.session_state.mindease = mindease
+        st.session_state.mindease = MindEaseAI()
     if "messages" not in st.session_state:
         st.session_state.messages = []
     if "show_sentiment" not in st.session_state:
@@ -54,8 +57,8 @@ with st.sidebar:
     st.markdown("*Your compassionate wellness companion*")
     st.divider()
 
-    # Show RAG status
-    if st.session_state.mindease.rag_enabled:
+    # Show RAG status based on chunks loaded
+    if chunks:
         st.success("📚 Wellness Guides: Loaded")
     else:
         st.warning("📚 Wellness Guides: Not available")
@@ -78,7 +81,7 @@ with st.sidebar:
     if st.button("🔄 New Conversation", use_container_width=True):
         st.session_state.mindease.clear_conversation()
         st.session_state.messages = []
-        st.experimental_rerun()
+        st.rerun()
     
     if st.button("📖 About MindEase", use_container_width=True):
         st.info("""
