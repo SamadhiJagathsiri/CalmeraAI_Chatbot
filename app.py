@@ -1,16 +1,20 @@
 import streamlit as st
-from chatbot.mindease_ai import MindEaseAI
-import time
 import os
+from chatbot.mindease_ai import MindEaseAI
+from utils.document_loader import WellnessDocumentLoader  # import the loader
+import time
 
-guides_path = os.path.join(os.getcwd(), "data", "guides")
-st.write("Looking in:", guides_path)
 
-if os.path.exists(guides_path):
-    files = os.listdir(guides_path)
-    st.write("Files found:", files)
-else:
-    st.write("Folder not found!")
+loader = WellnessDocumentLoader()
+chunks = loader.process_documents() 
+
+st.write("Looking in:", loader.guides_path)
+st.write(f"PDF chunks loaded: {len(chunks)}")
+
+
+for i, chunk in enumerate(chunks[:3]):
+    st.write(f"Chunk {i+1} preview:")
+    st.write(chunk.page_content[:300], "...")
 
 
 st.set_page_config(
@@ -20,34 +24,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.5rem;
-        color: #2E7D32;
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
-    .subtitle {
-        text-align: center;
-        color: #666;
-        margin-bottom: 2rem;
-    }
-    .crisis-warning {
-        background-color: #FFF3E0;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #FF6F00;
-        margin: 1rem 0;
-    }
-    .sentiment-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
+    .main-header { font-size: 2.5rem; color: #2E7D32; text-align: center; margin-bottom: 0.5rem; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 2rem; }
+    .crisis-warning { background-color: #FFF3E0; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #FF6F00; margin: 1rem 0; }
+    .sentiment-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 600; }
     .positive { background-color: #E8F5E9; color: #2E7D32; }
     .negative { background-color: #FFEBEE; color: #C62828; }
     .neutral { background-color: #F5F5F5; color: #616161; }
@@ -70,16 +52,15 @@ with st.sidebar:
     st.markdown("### 🌱 MindEase AI")
     st.markdown("*Your compassionate wellness companion*")
     st.divider()
-    
-    
-    if st.session_state.mindease.rag_enabled:
+
+   
+    if chunks:
         st.success("📚 Wellness Guides: Loaded")
     else:
         st.warning("📚 Wellness Guides: Not available")
         st.caption("Add PDF guides to `data/guides/` to enable")
-    
+
     st.divider()
-    
     
     st.markdown("### ⚙️ Settings")
     st.session_state.show_sentiment = st.checkbox(
@@ -87,13 +68,11 @@ with st.sidebar:
         value=st.session_state.show_sentiment
     )
     
-    
     if st.session_state.messages:
         emotional_state = st.session_state.mindease.get_emotional_summary()
         st.info(f"💭 Recent mood: {emotional_state}")
     
     st.divider()
-    
     
     if st.button("🔄 New Conversation", use_container_width=True):
         st.session_state.mindease.clear_conversation()
@@ -120,7 +99,6 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         
-        
         if st.session_state.show_sentiment and "sentiment" in message:
             sentiment = message["sentiment"]
             polarity = sentiment.get("polarity", 0)
@@ -142,17 +120,14 @@ for message in st.session_state.messages:
 
 
 if prompt := st.chat_input("Share what's on your mind..."):
-    
     with st.chat_message("user"):
         st.markdown(prompt)
     
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             result = st.session_state.mindease.process_message(prompt)
-            
             response = result["response"]
             sentiment = result["sentiment"]
             crisis = result["crisis_detected"]
@@ -160,13 +135,11 @@ if prompt := st.chat_input("Share what's on your mind..."):
             
             st.markdown(response)
             
-           
             if crisis:
                 st.markdown('<div class="crisis-warning">⚠️ Crisis resources provided</div>', unsafe_allow_html=True)
             
             if used_rag:
                 st.caption("📚 Response enhanced with wellness guides")
-            
             
             if st.session_state.show_sentiment:
                 polarity = sentiment.get("polarity", 0)
@@ -186,7 +159,6 @@ if prompt := st.chat_input("Share what's on your mind..."):
                     unsafe_allow_html=True
                 )
     
-   
     st.session_state.messages.append({
         "role": "assistant",
         "content": response,
@@ -194,7 +166,6 @@ if prompt := st.chat_input("Share what's on your mind..."):
         "crisis": crisis,
         "used_rag": used_rag
     })
-
 
 st.divider()
 st.caption("⚠️ MindEase is a supportive tool, not a substitute for professional mental health care. If you're in crisis, please contact emergency services or a crisis helpline.")
