@@ -4,17 +4,17 @@ from utils.config import Config
 from utils.vectorstore_manager import VectorStoreManager
 
 # -----------------------------
-# Initialize vector store manager and MindEase AI
+# Initialize vector store manager
 # -----------------------------
 vectorstore_manager = VectorStoreManager()
-vectorstore_manager.get_retriever()  # This will create/load vectorstore internally
+# Ensure vector store is ready (creates/loads internally)
+vectorstore_manager.get_retriever()  
 
-
-# Pass vectorstore_manager to MindEaseAI
-mindease = MindEaseAI(vectorstore_manager=vectorstore_manager)
+# Initialize MindEaseAI and pass vectorstore_manager if needed
+mindease = MindEaseAI()  # Assuming constructor uses VectorStoreManager internally
 
 # -----------------------------
-# Streamlit page config
+# Page configuration & styles
 # -----------------------------
 st.set_page_config(
     page_title="MindEase AI - Your Wellness Companion",
@@ -38,15 +38,12 @@ st.markdown("""
 # -----------------------------
 # Initialize session state
 # -----------------------------
-def init_session_state():
-    if "mindease" not in st.session_state:
-        st.session_state.mindease = mindease  # use the instance with vectorstore
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    if "show_sentiment" not in st.session_state:
-        st.session_state.show_sentiment = False
-
-init_session_state()
+if "mindease" not in st.session_state:
+    st.session_state.mindease = mindease
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if "show_sentiment" not in st.session_state:
+    st.session_state.show_sentiment = False
 
 # -----------------------------
 # Sidebar
@@ -78,7 +75,7 @@ with st.sidebar:
     if st.button("🔄 New Conversation", use_container_width=True):
         st.session_state.mindease.clear_conversation()
         st.session_state.messages = []
-        st.rerun()
+        st.experimental_rerun()
 
     if st.button("📖 About MindEase", use_container_width=True):
         st.info("""
