@@ -133,13 +133,13 @@ with st.sidebar:
         """)
     
     
-    with st.expander("🔧 Debug Info"):
-        st.write(f"RAG Enabled: {st.session_state.mindease.rag_enabled}")
-        st.write(f"Messages: {len(st.session_state.messages)}")
-        if hasattr(st.session_state.mindease, 'vectorstore_manager'):
-            st.write("VectorStore: Available")
-        else:
-            st.write("VectorStore: Not available")
+    #with st.expander("🔧 Debug Info"):
+     #   st.write(f"RAG Enabled: {st.session_state.mindease.rag_enabled}")
+      #  st.write(f"Messages: {len(st.session_state.messages)}")
+       # if hasattr(st.session_state.mindease, 'vectorstore_manager'):
+       #     st.write("VectorStore: Available")
+       # else:
+       #     st.write("VectorStore: Not available")
 
 # Main content
 st.markdown('<h1 class="main-header">🌱 MindEase AI</h1>', unsafe_allow_html=True)
