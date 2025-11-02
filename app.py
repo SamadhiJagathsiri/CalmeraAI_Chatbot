@@ -3,7 +3,14 @@ from chatbot.mindease_ai import MindEaseAI
 import time
 import os
 
-st.write("Current working directory:", os.getcwd())
+guides_path = os.path.join(os.getcwd(), "data", "guides")
+st.write("Looking in:", guides_path)
+
+if os.path.exists(guides_path):
+    files = os.listdir(guides_path)
+    st.write("Files found:", files)
+else:
+    st.write("Folder not found!")))
 
 
 st.set_page_config(
