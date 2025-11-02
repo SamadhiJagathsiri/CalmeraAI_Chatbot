@@ -4,7 +4,16 @@ from chatbot.mindease_ai import MindEaseAI
 from utils.document_loader import WellnessDocumentLoader  
 import time
 
+loader = WellnessDocumentLoader()
+chunks = loader.process_documents() 
 
+st.write("Looking in:", loader.guides_path)
+st.write(f"PDF chunks loaded: {len(chunks)}")
+
+
+for i, chunk in enumerate(chunks[:3]):
+    st.write(f"Chunk {i+1} preview:")
+    st.write(chunk.page_content[:300], "...")
 
 
 
