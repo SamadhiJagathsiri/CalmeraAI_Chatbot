@@ -4,12 +4,18 @@ from utils.config import Config
 from utils.vectorstore_manager import VectorStoreManager
 
 
-# Load existing vector store
+# Initialize vector store manager
 vectorstore_manager = VectorStoreManager()
+
+# Load the vector store
 vectorstore_manager.load_vectorstore()
 
-# Initialize MindEaseAI with RAG support
+# Pass it to MindEaseAI if your constructor supports it
 mindease = MindEaseAI(vectorstore_manager=vectorstore_manager)
+
+print(hasattr(vectorstore_manager, "load_vectorstore"))  # Should print True
+print(callable(vectorstore_manager.load_vectorstore))    # Should print True
+
 
 st.set_page_config(
     page_title="MindEase AI - Your Wellness Companion",
