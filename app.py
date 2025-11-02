@@ -55,16 +55,10 @@ def init_session_state():
         with st.spinner("🌱 Initializing MindEase AI..."):
             try:
                 
-                st.write("📚 Loading vectorstore...")
-                st.write(f"Using VectorStoreManager from: {vsm.__file__}")
                 
                 vectorstore_manager = VectorStoreManager()
                 vectorstore_manager.create_vectorstore()
                 
-                st.write("✓ Vectorstore loaded")
-                
-                
-                st.write("🤖 Initializing MindEase AI...")
                 mindease = MindEaseAI(vectorstore_manager=vectorstore_manager)
                 
                 st.session_state.mindease = mindease
@@ -72,7 +66,6 @@ def init_session_state():
                 st.session_state.show_sentiment = False
                 st.session_state.initialized = True
                 
-                st.write("✓ MindEase AI ready!")
                 time.sleep(1)
                 st.rerun()
                 
