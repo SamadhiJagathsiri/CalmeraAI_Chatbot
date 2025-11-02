@@ -1,10 +1,16 @@
 import streamlit as st
 from chatbot.mindease_ai import MindEaseAI
 from utils.config import Config
+from utils.vectorstore_manager import VectorStoreManager
 
-# -----------------------------
-# Page configuration
-# -----------------------------
+
+# Load existing vector store
+vectorstore_manager = VectorStoreManager()
+vectorstore_manager.load_vectorstore()
+
+# Initialize MindEaseAI with RAG support
+mindease = MindEaseAI(vectorstore_manager=vectorstore_manager)
+
 st.set_page_config(
     page_title="MindEase AI - Your Wellness Companion",
     page_icon="🌱",
