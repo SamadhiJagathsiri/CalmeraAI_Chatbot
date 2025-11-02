@@ -1,7 +1,8 @@
 from langchain_cohere import CohereEmbeddings
 from utils.config import Config
 from utils.document_loader import WellnessDocumentLoader
-from langchain_chroma import Chroma
+from langchain.vectorstores import Chroma
+
 
 import os
 
