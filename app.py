@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+
 st.markdown("""
 <style>
     .main-header {
@@ -45,7 +45,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
+
 def init_session_state():
     """Initialize session state variables"""
     if "initialized" not in st.session_state:
@@ -54,7 +54,7 @@ def init_session_state():
     if not st.session_state.initialized:
         with st.spinner("🌱 Initializing MindEase AI..."):
             try:
-                # Create and load vector store
+                
                 st.write("📚 Loading vectorstore...")
                 st.write(f"Using VectorStoreManager from: {vsm.__file__}")
                 
@@ -63,7 +63,7 @@ def init_session_state():
                 
                 st.write("✓ Vectorstore loaded")
                 
-                # Initialize MindEase AI with the vectorstore manager
+                
                 st.write("🤖 Initializing MindEase AI...")
                 mindease = MindEaseAI(vectorstore_manager=vectorstore_manager)
                 
@@ -83,39 +83,39 @@ def init_session_state():
 
 init_session_state()
 
-# Sidebar
+
 with st.sidebar:
     st.markdown("### 🌱 MindEase AI")
     st.markdown("*Your compassionate wellness companion*")
     st.divider()
     
-    # RAG Status
+    
     if st.session_state.mindease.rag_enabled:
         st.success("📚 Wellness Guides: Loaded")
-        # Show number of documents if available
+        
         if hasattr(st.session_state.mindease, 'vectorstore_manager'):
-            st.caption("RAG is active and ready")
+            st.caption("Wellness Guides available")
     else:
         st.warning("📚 Wellness Guides: Not available")
         st.caption("Add PDF guides to `data/guides/` to enable")
     
     st.divider()
     
-    # Settings
+   
     st.markdown("### ⚙️ Settings")
     st.session_state.show_sentiment = st.checkbox(
         "Show emotional analysis",
         value=st.session_state.show_sentiment
     )
     
-    # Emotional summary
+  
     if st.session_state.messages:
         emotional_state = st.session_state.mindease.get_emotional_summary()
         st.info(f"💭 Recent mood: {emotional_state}")
     
     st.divider()
     
-    # Actions
+  
     if st.button("🔄 New Conversation", use_container_width=True):
         st.session_state.mindease.clear_conversation()
         st.session_state.messages = []
@@ -132,7 +132,7 @@ with st.sidebar:
         Remember: This is not a replacement for professional mental health care.
         """)
     
-    # Debug info (collapsible)
+    
     with st.expander("🔧 Debug Info"):
         st.write(f"RAG Enabled: {st.session_state.mindease.rag_enabled}")
         st.write(f"Messages: {len(st.session_state.messages)}")
@@ -150,7 +150,6 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         
-        # Show sentiment badge if enabled
         if st.session_state.show_sentiment and "sentiment" in message:
             sentiment = message["sentiment"]
             polarity = sentiment.get("polarity", 0)
@@ -170,15 +169,15 @@ for message in st.session_state.messages:
                 unsafe_allow_html=True
             )
 
-# Chat input
+
 if prompt := st.chat_input("Share what's on your mind..."):
-    # Display user message
+    
     with st.chat_message("user"):
         st.markdown(prompt)
     
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    # Generate response
+    
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
@@ -191,14 +190,14 @@ if prompt := st.chat_input("Share what's on your mind..."):
                 
                 st.markdown(response)
                 
-                # Show indicators
+               
                 if crisis:
                     st.markdown('<div class="crisis-warning">⚠️ Crisis resources provided</div>', unsafe_allow_html=True)
                 
                 if used_rag:
                     st.caption("📚 Response enhanced with wellness guides")
                 
-                # Show sentiment
+               
                 if st.session_state.show_sentiment:
                     polarity = sentiment.get("polarity", 0)
                     
@@ -217,7 +216,7 @@ if prompt := st.chat_input("Share what's on your mind..."):
                         unsafe_allow_html=True
                     )
                 
-                # Save assistant message
+                
                 st.session_state.messages.append({
                     "role": "assistant",
                     "content": response,
@@ -230,6 +229,6 @@ if prompt := st.chat_input("Share what's on your mind..."):
                 st.error(f"Error generating response: {str(e)}")
                 st.write("Please try again or start a new conversation.")
 
-# Footer
+
 st.divider()
 st.caption("⚠️ MindEase is a supportive tool, not a substitute for professional mental health care. If you're in crisis, please contact emergency services or a crisis helpline.")
