@@ -10,7 +10,7 @@ Main components:
 - SentimentAnalyzer: Emotional analysis
 """
 
-from chatbot.calmeraai import MindEaseAI
+from chatbot.mindease_ai import MindEaseAI
 from chatbot.crisis_detection import CrisisDetector
 from chatbot.sentiment_analysis import SentimentAnalyzer
 
