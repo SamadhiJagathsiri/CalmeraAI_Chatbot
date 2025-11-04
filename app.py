@@ -1,5 +1,5 @@
 import streamlit as st
-from chatbot.calmeraai import MindEaseAI
+from chatbot.mindease_ai import MindEaseAI
 import time
 from utils.vectorstore_manager import VectorStoreManager
 import utils.vectorstore_manager as vsm
