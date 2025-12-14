@@ -1,10 +1,11 @@
 from langchain_cohere import ChatCohere
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_core.output_parsers import StrOutputParser
 from chatbot.prompts.templates import RAG_PROMPT
 from chatbot.memory.conversation_memory import MindEaseMemory
 from utils.config import Config
 from utils.vectorstore_manager import VectorStoreManager
+
 
 class RAGChain:
     """Retrieval-Augmented Generation chain for wellness guide PDFs"""
@@ -35,25 +36,23 @@ class RAGChain:
     def _initialize_chain(self):
         """Initialize the RAG chain with retriever"""
         
-        
         if not self.vectorstore_manager:
             print("⚠️ No vector store manager provided. RAG disabled.")
             return
-        
         
         if not hasattr(self.vectorstore_manager, 'vectorstore') or self.vectorstore_manager.vectorstore is None:
             print("⚠️ No vectorstore found in manager. RAG disabled.")
             return
         
         try:
-            
+            # Create retriever
             self.retriever = self.vectorstore_manager.get_retriever(k=3)
             
             if not self.retriever:
                 print("⚠️ Failed to create retriever. RAG disabled.")
                 return
             
-            
+            # Test retriever
             try:
                 test_results = self.retriever.get_relevant_documents("wellness")
                 print(f"✓ Retriever test successful: Found {len(test_results)} documents")
@@ -62,22 +61,27 @@ class RAGChain:
                 self.retriever = None
                 return
             
+            # Build custom RAG chain using LCEL (LangChain Expression Language)
+            def format_docs(docs):
+                """Format retrieved documents into a single string"""
+                return "\n\n".join(doc.page_content for doc in docs)
             
-            doc_chain = create_stuff_documents_chain(
-                llm=self.llm, 
-                prompt=RAG_PROMPT
+            # Create the RAG chain
+            self.chain = (
+                RunnableParallel(
+                    context=self.retriever | format_docs,
+                    input=RunnablePassthrough(),
+                    chat_history=lambda x: self.memory.get_chat_history()
+                )
+                | RAG_PROMPT
+                | self.llm
+                | StrOutputParser()
             )
             
-            
-            self.chain = create_retrieval_chain(
-                retriever=self.retriever,
-                combine_docs_chain=doc_chain
-            )
-            
-            print(" RAG chain initialized successfully")
+            print("✓ RAG chain initialized successfully")
             
         except Exception as e:
-            print(f" Error initializing RAG chain: {e}")
+            print(f"❌ Error initializing RAG chain: {e}")
             import traceback
             traceback.print_exc()
             self.chain = None
@@ -112,33 +116,24 @@ class RAGChain:
             print("⚠️ RAG not available, returning None")
             return None
         
-        
-        chat_history = self.memory.get_chat_history()
-        
         try:
             print(f"🔍 Retrieving documents for: {user_input[:50]}...")
             
+            # Invoke the chain
+            answer = self.chain.invoke(user_input)
             
-            result = self.chain.invoke({
-                "input": user_input,
-                "chat_history": chat_history
-            })
-            
-            
-            answer = result.get("answer", "").strip()
-            
-            
-            context_docs = result.get("context", [])
-            print(f"RAG response generated using {len(context_docs)} documents")
-            
-            if not answer:
+            if not answer or not answer.strip():
                 print("⚠️ RAG returned empty answer")
                 return None
             
-            return answer
+            # Get context docs for logging
+            context_docs = self.retriever.get_relevant_documents(user_input)
+            print(f"✓ RAG response generated using {len(context_docs)} documents")
+            
+            return answer.strip()
             
         except Exception as e:
-            print(f" Error in RAG generation: {e}")
+            print(f"❌ Error in RAG generation: {e}")
             import traceback
             traceback.print_exc()
             return None
@@ -163,7 +158,7 @@ class RAGChain:
             print(f"✓ Found {len(results)} documents for query: {query[:50]}...")
             return results
         except Exception as e:
-            print(f" Error searching guides: {e}")
+            print(f"❌ Error searching guides: {e}")
             return []
     
     def get_relevant_context(self, query: str, k: int = 3) -> str:
