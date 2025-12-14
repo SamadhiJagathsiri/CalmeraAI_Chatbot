@@ -1,5 +1,6 @@
-from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain.memory import ConversationBufferWindowMemory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages import BaseMessage
 from langchain.schema import AIMessage, HumanMessage
 from utils.config import Config
 
