@@ -1,5 +1,4 @@
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 MINDEASE_SYSTEM_PROMPT = """You are MindEase, a compassionate AI wellness companion designed to provide emotional support and mental health guidance.
 
